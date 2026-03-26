@@ -4,6 +4,10 @@ import Login from './pages/Login';
 import Register from './pages/Register'; // Import the new page
 import Dashboard from './pages/Dashboard'; // Import Dashboard
 
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/" />;
+};
 
 function App() {
   return (
@@ -12,7 +16,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
         </Routes>
       </div>
     </Router>
@@ -20,3 +29,7 @@ function App() {
 }
 
 export default App;
+
+
+
+// Inside your Routes in App.jsx:

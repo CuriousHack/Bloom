@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -12,10 +13,35 @@ const Register = () => {
     confirmPassword: '' 
   });
 
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Logic for Backend Auth will go here later
-    console.log("Registering user:", formData);
+    setError('');
+    
+    if (formData.password !== formData.confirmPassword) {
+      return setError("Passwords do not match");
+    }
+
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/register', {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password
+      });
+      
+      // Save token and user info
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,6 +132,12 @@ const Register = () => {
               />
             </div>
           </div>
+
+          {error && (
+              <div className="bg-red-50 text-red-600 text-xs p-3 rounded-xl border border-red-100 mb-4 text-center font-bold">
+                {error}
+              </div>
+            )}
 
           {/* Action Button */}
           <button 
