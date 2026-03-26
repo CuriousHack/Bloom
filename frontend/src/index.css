@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bloom-cream: #FDFDF5;
+  --color-bloom-sand: #F5F5DC;
+  --color-bloom-brown: #6D4C41;
+  --color-bloom-brown-dark: #3E2723;
+}
+
+body {
+  background-color: var(--color-bloom-cream);
+  color: var(--color-bloom-brown-dark);
+}
