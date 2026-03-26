@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -18,6 +19,7 @@ mongoose.connect(process.env.MONGO_URI)
 // API Routes (To be created)
 // app.use('/api/auth', require('./routes/auth'));
 // app.use('/api/payments', require('./routes/payments'));
+app.use('/api/auth', authRoutes);
 
 // Serve Frontend in Production
 if (process.env.NODE_ENV === 'production') {

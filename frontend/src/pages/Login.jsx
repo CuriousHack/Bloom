@@ -1,16 +1,28 @@
 import React, { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", formData);
-    // Logic for Backend Auth will go here later
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/login', formData);
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid credentials");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,6 +76,12 @@ const Login = () => {
               </button>
             </div>
           </div>
+
+          {error && (
+              <div className="bg-red-50 text-red-600 text-xs p-3 rounded-xl border border-red-100 mb-4 text-center font-bold">
+                {error}
+              </div>
+            )}
 
           {/* Action Button */}
           <button 
