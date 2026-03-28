@@ -1,33 +1,72 @@
-import React from 'react';
-import { X } from 'lucide-react'; // Use any currency icon if Naira isn't available
+import React, { useState } from 'react';
+import { X, Loader2 } from 'lucide-react';
+import api from '../api/axios';
 
-const AddPaymentModal = ({ isOpen, onClose }) => {
+const AddPaymentModal = ({ isOpen, onClose, activeCoopId, onPaymentAdded }) => {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    amount: '',
+    date: new Date().toISOString().split('T')[0], // Default to today
+    description: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!activeCoopId) return alert("Please select a group first");
+
+    setLoading(true);
+    try {
+      const res = await api.post('/contributions', {
+        ...formData,
+        cooperativeId: activeCoopId
+      });
+      
+      // Notify Dashboard to refresh the list
+      onPaymentAdded(res.data);
+      
+      // Reset form and close
+      setFormData({ 
+        amount: '', 
+        date: new Date().toISOString().split('T')[0], 
+        description: '' 
+      });
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Error saving payment");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-bloom-brown-dark/40 backdrop-blur-[2px]">
-      {/* Clickable Backdrop to close */}
+      {/* Clickable Backdrop */}
       <div className="absolute inset-0" onClick={onClose}></div>
 
       {/* Slide-up Content */}
       <div className="relative w-full max-w-md bg-white rounded-t-[3rem] p-8 shadow-2xl animate-in slide-in-from-bottom duration-300">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-bloom-brown-dark">New Payment</h2>
-          <button onClick={onClose} className="p-2 bg-bloom-sand rounded-full text-bloom-brown">
+          <h2 className="text-xl font-bold text-bloom-brown-dark">Add Contribution</h2>
+          <button onClick={onClose} className="p-2 bg-bloom-sand rounded-full text-bloom-brown active:scale-90 transition-transform">
             <X size={20} />
           </button>
         </div>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Amount Input */}
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Amount Paid</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-bloom-brown-dark">₦</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-bloom-brown-dark text-lg">₦</span>
               <input 
                 type="number" 
                 placeholder="0.00"
-                className="w-full bg-bloom-sand/30 border-none py-5 pl-10 pr-4 rounded-2xl text-xl font-bold focus:ring-2 focus:ring-bloom-brown/20 outline-none transition-all"
+                value={formData.amount}
+                onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                className="w-full bg-bloom-sand/30 border-none py-5 pl-10 pr-4 rounded-2xl text-xl font-bold focus:ring-2 focus:ring-bloom-brown/20 outline-none transition-all placeholder:text-bloom-brown/20"
                 required
               />
             </div>
@@ -35,29 +74,41 @@ const AddPaymentModal = ({ isOpen, onClose }) => {
 
           {/* Date Input */}
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Date of Meeting</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Payment Date</label>
             <input 
               type="date" 
-              className="w-full bg-bloom-sand/30 border-none py-4 px-4 rounded-2xl font-medium focus:ring-2 focus:ring-bloom-brown/20 outline-none"
+              value={formData.date}
+              onChange={(e) => setFormData({...formData, date: e.target.value})}
+              className="w-full bg-bloom-sand/30 border-none py-4 px-4 rounded-2xl font-semibold text-bloom-brown-dark focus:ring-2 focus:ring-bloom-brown/20 outline-none"
               required
             />
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Description</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Description / Note</label>
             <textarea 
-              placeholder="e.g. Mid-month contribution"
-              className="w-full bg-bloom-sand/30 border-none py-4 px-4 rounded-2xl font-medium focus:ring-2 focus:ring-bloom-brown/20 outline-none h-24 resize-none"
+              placeholder="e.g. Mid-month meeting contribution"
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              className="w-full bg-bloom-sand/30 border-none py-4 px-4 rounded-2xl font-medium focus:ring-2 focus:ring-bloom-brown/20 outline-none h-24 resize-none placeholder:text-bloom-brown/30"
             ></textarea>
           </div>
 
-          {/* Submit */}
+          {/* Submit Button */}
           <button 
             type="submit"
-            className="w-full bg-bloom-brown text-white py-5 rounded-2xl font-bold shadow-lg shadow-bloom-brown/20 active:scale-[0.98] transition-all"
+            disabled={loading}
+            className="w-full bg-bloom-brown hover:bg-bloom-brown-dark text-white py-5 rounded-2xl font-bold shadow-lg shadow-bloom-brown/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
           >
-            Confirm & Save
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin" size={20} />
+                <span>Saving...</span>
+              </>
+            ) : (
+              "Confirm & Save"
+            )}
           </button>
         </form>
       </div>
