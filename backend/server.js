@@ -20,6 +20,7 @@ mongoose.connect(process.env.MONGO_URI)
 // app.use('/api/auth', require('./routes/auth'));
 // app.use('/api/payments', require('./routes/payments'));
 app.use('/api/auth', authRoutes);
+app.use('/api/cooperatives', require('./routes/cooperatives'));
 
 // Serve Frontend in Production
 if (process.env.NODE_ENV === 'production') {
