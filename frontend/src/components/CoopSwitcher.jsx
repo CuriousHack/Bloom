@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Check, PlusCircle } from 'lucide-react';
 
-const CoopSwitcher = ({ isOpen, onClose, groups, activeId, onSelect }) => {
+  const CoopSwitcher = ({ isOpen, onClose, groups, activeId, onSelect, openCreateModal }) => {
   if (!isOpen) return null;
 
   return (
@@ -30,10 +30,17 @@ const CoopSwitcher = ({ isOpen, onClose, groups, activeId, onSelect }) => {
             </button>
           ))}
 
-          <button className="w-full flex items-center justify-center gap-2 p-5 rounded-2xl border-2 border-dashed border-bloom-brown/30 text-bloom-brown font-bold mt-4 hover:bg-bloom-sand/30 transition-all">
+          <button 
+            onClick={() => {
+                onClose();      // Close the switcher
+                openCreateModal(); // Open the create group modal
+                
+            }}
+            className="w-full flex items-center justify-center gap-2 p-5 rounded-2xl border-2 border-dashed border-bloom-brown/30 text-bloom-brown font-bold mt-4"
+            >
             <PlusCircle size={20} />
             Create New Group
-          </button>
+            </button>
         </div>
       </div>
     </div>
@@ -41,3 +48,5 @@ const CoopSwitcher = ({ isOpen, onClose, groups, activeId, onSelect }) => {
 };
 
 export default CoopSwitcher;
+
+
