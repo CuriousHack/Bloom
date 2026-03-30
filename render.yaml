@@ -4,7 +4,7 @@ services:
     name: bloom-api
     env: node
     plan: free
-    buildCommand: npm install && cd backend && npm install
+    buildCommand: cd backend && npm install
     startCommand: node backend/server.js
     envVars:
       - key: MONGO_URI
@@ -18,7 +18,7 @@ services:
   - type: web
     name: bloom-app
     env: static
-    buildCommand: cd frontend && npm install && npm run build
+    buildCommand: cd frontend && npm install --legacy-peer-deps && npm run build
     staticPublishPath: ./frontend/dist
     # Corrected routing for Single Page Applications (SPA)
     routes:
