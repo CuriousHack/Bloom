@@ -1,0 +1,24 @@
+services:
+  # The Backend (Node.js)
+  - type: web
+    name: bloom-api
+    env: node
+    plan: free
+    buildCommand: npm install && cd backend && npm install
+    startCommand: node backend/server.js
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+
+  # The Frontend (Static Site)
+  - type: web
+    name: bloom-app
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routingRules:
+      - route: /*
+        rewrite: /index.html
