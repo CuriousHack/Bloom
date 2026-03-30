@@ -1,5 +1,5 @@
 services:
-  # The Backend (Node.js)
+  # 1. The Backend (Node.js)
   - type: web
     name: bloom-api
     env: node
@@ -11,14 +11,18 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: NODE_VERSION
+        value: 20 # Ensures compatibility
 
-  # The Frontend (Static Site)
+  # 2. The Frontend (Static Site)
   - type: web
     name: bloom-app
     env: static
     plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
-    routingRules:
-      - route: /*
-        rewrite: /index.html
+    # Corrected routing for Single Page Applications (SPA)
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
