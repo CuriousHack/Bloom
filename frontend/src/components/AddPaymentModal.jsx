@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import api from '../api/axios';
+import toast from 'react-hot-toast';
 
 const AddPaymentModal = ({ isOpen, onClose, activeCoopId, onPaymentAdded }) => {
   const [loading, setLoading] = useState(false);
@@ -10,34 +11,23 @@ const AddPaymentModal = ({ isOpen, onClose, activeCoopId, onPaymentAdded }) => {
     description: ''
   });
 
+ 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!activeCoopId) return alert("Please select a group first");
+  e.preventDefault();
+  
+  // Use a promise-based toast for better UX
+  const savingPromise = api.post('/contributions', { ...formData, cooperativeId: activeCoopId });
 
-    setLoading(true);
-    try {
-      const res = await api.post('/contributions', {
-        ...formData,
-        cooperativeId: activeCoopId
-      });
-      
-      // Notify Dashboard to refresh the list
+  toast.promise(savingPromise, {
+    loading: 'Recording payment...',
+    success: (res) => {
       onPaymentAdded(res.data);
-      
-      // Reset form and close
-      setFormData({ 
-        amount: '', 
-        date: new Date().toISOString().split('T')[0], 
-        description: '' 
-      });
       onClose();
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Error saving payment");
-    } finally {
-      setLoading(false);
-    }
-  };
+      return 'Payment saved successfully! 💰';
+    },
+    error: (err) => err.response?.data?.message || 'Could not save payment',
+  });
+};
 
   if (!isOpen) return null;
 

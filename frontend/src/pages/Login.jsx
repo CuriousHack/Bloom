@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,21 +11,18 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await api.post('/auth/login', formData);
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials");
-    } finally {
-      setLoading(false);
-    }
-  };
 
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await api.post('/auth/login', formData);
+    toast.success(`Welcome back, ${res.data.user.fullName}!`); // Friendly toast
+    localStorage.setItem('token', res.data.token);
+    navigate('/dashboard');
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Login failed");
+  }
+};
   return (
     <div className="min-h-screen bg-bloom-cream flex flex-col items-center justify-center px-6 py-12">
       {/* Logo Section */}

@@ -18,30 +18,28 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     
     if (formData.password !== formData.confirmPassword) {
-      return setError("Passwords do not match");
+      return toast.error("Passwords do not match! ❌");
     }
 
-    setLoading(true);
-    try {
-      const res = await api.post('/auth/register', {
-        fullName: formData.fullName,
-        email: formData.email,
-        password: formData.password
-      });
-      
-      // Save token and user info
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-    } finally {
-      setLoading(false);
-    }
+    // Create the registration promise
+    const registerPromise = api.post('/auth/register', {
+      fullName: formData.fullName,
+      email: formData.email,
+      password: formData.password
+    });
+
+    toast.promise(registerPromise, {
+      loading: 'Creating your Bloom account...',
+      success: (res) => {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        navigate('/dashboard');
+        return `Welcome to Bloom, ${res.data.user.fullName}! 🌱`;
+      },
+      error: (err) => err.response?.data?.message || 'Registration failed. Try again.',
+    });
   };
 
   return (

@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import toast from 'react-hot-toast';
 
 // Component Imports
 import AddPaymentModal from '../components/AddPaymentModal';
@@ -47,7 +48,8 @@ const Dashboard = () => {
         setActiveCoop(res.data[0]);
       }
     } catch (err) {
-      console.error("Failed to load groups");
+      console.error("Failed to load groups", err);
+      toast.error("Failed to load groups. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -56,16 +58,27 @@ const Dashboard = () => {
   const fetchContributions = async (coopId) => {
     try {
       const res = await api.get(`/contributions/${coopId}`);
+      toast.success("Contributions loaded successfully! 🌟");
       setContributions(res.data);
     } catch (err) {
-      console.error("Failed to load history");
+        toast.error("Failed to load contributions. Please try again later.");
+        console.error("Failed to load contributions", err);
     }
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    // 1. Clear local storage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // 2. Show success toast
+    toast.success("Logged out successfully. See you soon! 👋", {
+        icon: '🤎', // Custom brown heart icon to match theme
+    });
+
+    // 3. Redirect to Login
     navigate('/');
-  };
+    };
 
   // 3. Helper: Group raw contributions into Monthly Buckets
   const getMonthlySummary = () => {
@@ -88,6 +101,14 @@ const Dashboard = () => {
   }
 
   const monthlyHistory = getMonthlySummary();
+
+  const currentBalance = contributions.reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+    // Update your Header JSX to use this calculated 'currentBalance'
+    // <h2 className="text-4xl font-bold text-white mt-1 flex items-baseline gap-1">
+    // <span className="text-2xl opacity-60 font-medium">₦</span>
+    // {currentBalance.toLocaleString()}
+    // </h2>
 
   return (
     <div className="min-h-screen bg-bloom-cream pb-24 font-sans">
@@ -125,7 +146,7 @@ const Dashboard = () => {
           </p>
           <h2 className="text-4xl font-bold text-white mt-1.5 flex items-baseline gap-1">
             <span className="text-2xl opacity-60 font-medium">₦</span>
-            {(activeCoop?.balance || 0).toLocaleString()}
+            {currentBalance.toLocaleString()}
           </h2>
         </div>
       </header>
