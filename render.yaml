@@ -18,6 +18,13 @@ services:
   - type: web
     name: bloom-app
     env: static
+    envVars:
+      - key: VITE_API_URL
+        # This points to your 'bloom-api' service URL
+        fromService:
+          name: bloom-api
+          type: web
+          property: host
     buildCommand: cd frontend && npm install --legacy-peer-deps && npm run build
     staticPublishPath: ./frontend/dist
     # Corrected routing for Single Page Applications (SPA)

@@ -4,11 +4,15 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 const authRoutes = require('./routes/auth');
+const cors = require('cors');
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*', 
+  credentials: true
+}));
 app.use(express.json());
 
 // Database Connection
@@ -16,9 +20,6 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.log("❌ Connection Error:", err));
 
-// API Routes (To be created)
-// app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/payments', require('./routes/payments'));
 app.use('/api/auth', authRoutes);
 app.use('/api/cooperatives', require('./routes/cooperatives'));
 app.use('/api/contributions', require('./routes/contributions'));

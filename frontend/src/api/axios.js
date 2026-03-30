@@ -1,11 +1,15 @@
 import axios from 'axios';
 
+// Fallback to localhost if the environment variable isn't set
+const baseURL = import.meta.env.VITE_API_URL 
+  ? `https://${import.meta.env.VITE_API_URL}/api` 
+  : 'http://localhost:5000/api';
+
 const instance = axios.create({
-  // If we're on Render, it uses the same domain, otherwise localhost:5000
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: baseURL,
 });
 
-// Automatically attach JWT token to every request if it exists
+// Attach token
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
