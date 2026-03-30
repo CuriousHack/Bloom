@@ -6,6 +6,7 @@ import Register from './pages/Register'; // Import the new page
 import Dashboard from './pages/Dashboard'; // Import Dashboard
 import ReactDOM from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register'; // Import SW registration
+import UpdatePrompt from './components/UpdatePrompt';
 
 // Automatically update the SW when available
 registerSW({ immediate: true });
@@ -41,6 +42,7 @@ function App() {
           },
         }} 
       />
+      <UpdatePrompt /> {/* Show update prompt when a new version is available */}
       <div className="bg-bloom-cream min-h-screen">
         <Routes>
           <Route path="/" element={<Login />} />
