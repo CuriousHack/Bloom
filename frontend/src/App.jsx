@@ -4,6 +4,17 @@ import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Register from './pages/Register'; // Import the new page
 import Dashboard from './pages/Dashboard'; // Import Dashboard
+import ReactDOM from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register'; // Import SW registration
+
+// Automatically update the SW when available
+registerSW({ immediate: true });
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
