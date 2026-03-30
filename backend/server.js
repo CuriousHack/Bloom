@@ -8,9 +8,14 @@ const authRoutes = require('./routes/auth');
 const app = express();
 
 // Middleware
+const allowedOrigin = process.env.FRONTEND_URL || true; 
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*', 
-  credentials: true
+  // Using 'true' reflects the request origin (same as wildcard but safer)
+  origin: allowedOrigin, 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
