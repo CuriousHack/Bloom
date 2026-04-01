@@ -8,7 +8,15 @@ const authRoutes = require('./routes/auth');
 const app = express();
 
 // Middleware
-const allowedOrigin = process.env.FRONTEND_URL || true; 
+// 1. Get the raw value from Render
+const rawFrontend = process.env.FRONTEND_URL;
+
+// 2. Format it into a valid Origin URL
+const allowedOrigin = rawFrontend 
+  ? (rawFrontend.includes('onrender.com') 
+      ? (rawFrontend.startsWith('http') ? rawFrontend : `https://${rawFrontend}`)
+      : `https://${rawFrontend}.onrender.com`) 
+  : 'http://localhost:5173'; // Fallback for local Vite development
 
 app.use(cors({
   // Using 'true' reflects the request origin (same as wildcard but safer)
