@@ -1,8 +1,13 @@
 import axios from 'axios';
 
-// Fallback to localhost if the environment variable isn't set
-const baseURL = import.meta.env.VITE_API_URL 
-  ? `https://${import.meta.env.VITE_API_URL}/api` 
+// 1. Get the raw host from the environment
+const rawHost = import.meta.env.VITE_API_URL;
+
+// 2. Build the full URL properly
+const baseURL = rawHost 
+  ? (rawHost.includes('onrender.com') 
+      ? `https://${rawHost}/api` 
+      : `https://${rawHost}.onrender.com/api`) // Force the suffix if missing
   : 'http://localhost:5000/api';
 
 const instance = axios.create({
