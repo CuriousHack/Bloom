@@ -44,7 +44,7 @@ const Profile = () => {
         </button>
         
         <div className="relative inline-block mt-4">
-          <div className="w-28 h-28 bg-bloom-cream rounded-[2.5rem] shadow-inner flex items-center justify-center text-bloom-brown text-4xl font-black border-4 border-white/20">
+          <div className="w-28 h-28 bg-bloom-cream rounded-[2.5rem] shadow-inner flex items-center justify-center text-bloom-brown text-4xl font-bold border-4 border-white/20">
             {user.fullName[0]}
           </div>
           <div className="absolute bottom-0 right-0 bg-bloom-brown-dark text-white p-2 rounded-xl shadow-lg border-2 border-bloom-brown">
@@ -52,7 +52,7 @@ const Profile = () => {
           </div>
         </div>
         
-        <h2 className="text-2xl font-black text-white mt-4">{user.fullName}</h2>
+        <h2 className="text-2xl font-bold text-white mt-4">{user.fullName}</h2>
         <p className="text-bloom-cream/60 text-sm font-medium">{user.email}</p>
       </header>
 
@@ -96,7 +96,7 @@ const Profile = () => {
               </div>
               <div className="text-left">
                 <p className="font-bold text-red-600">Logout</p>
-                <p className="text-[10px] text-red-400 uppercase font-black tracking-widest">End Current Session</p>
+                <p className="text-[10px] text-red-400 uppercase font-bold tracking-widest">End Current Session</p>
               </div>
             </div>
             <ChevronRight size={18} className="text-red-200" />
@@ -115,7 +115,7 @@ const Profile = () => {
           <div className="relative bg-white w-full max-w-lg rounded-t-[3.5rem] p-10 pb-[calc(env(safe-area-inset-bottom)+2rem)] animate-in slide-in-from-bottom duration-300">
             <div className="w-12 h-1.5 bg-bloom-sand rounded-full mx-auto mb-8" />
             
-            <h3 className="text-2xl font-black text-bloom-brown-dark mb-2">Update Name</h3>
+            <h3 className="text-2xl font-bold text-bloom-brown-dark mb-2">Update Name</h3>
             <p className="text-sm text-bloom-brown/40 mb-8 font-medium">How should we address you in Bloom?</p>
             
             <form onSubmit={handleUpdateProfile} className="space-y-6">
@@ -124,7 +124,7 @@ const Profile = () => {
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="bg-transparent w-full outline-none text-bloom-brown-dark font-bold text-lg"
+                  className="bg-transparent w-full outline-none text-bloom-brown-dark font-bold text-base"
                   placeholder="Full Name"
                   autoFocus
                 />
@@ -132,7 +132,7 @@ const Profile = () => {
               
               <button 
                 type="submit"
-                className="w-full bg-bloom-brown text-white py-5 rounded-[2rem] font-black shadow-xl active:scale-95 transition-all"
+                className="w-full bg-bloom-brown text-white py-5 rounded-[2rem] font-bold shadow-xl active:scale-95 transition-all"
               >
                 Save Changes
               </button>
@@ -143,7 +143,7 @@ const Profile = () => {
 
       {/* --- FOOTER INFO --- */}
       <div className="text-center mt-8 px-8">
-        <p className="text-[10px] text-bloom-brown/30 font-black uppercase tracking-[0.2em]">Bloom v2.0.0</p>
+        <p className="text-[10px] text-bloom-brown/30 font-bold uppercase tracking-[0.2em]">Bloom v2.0.0</p>
         <p className="text-[10px] text-bloom-brown/20 mt-1 font-medium italic">Crafted for cooperative growth</p>
       </div>
     </div>
@@ -162,7 +162,7 @@ const ProfileItem = ({ icon, label, sub, onClick }) => (
       </div>
       <div className="text-left">
         <p className="font-bold text-bloom-brown-dark">{label}</p>
-        <p className="text-[10px] text-bloom-brown/40 uppercase font-black tracking-widest">{sub}</p>
+        <p className="text-[10px] text-bloom-brown/40 uppercase font-bold tracking-widest">{sub}</p>
       </div>
     </div>
     <ChevronRight size={18} className="text-bloom-brown/20" />

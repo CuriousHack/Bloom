@@ -25,7 +25,7 @@ import { X, Check, PlusCircle } from 'lucide-react';
                 : 'border-transparent bg-bloom-sand/50 text-bloom-brown/60'
               }`}
             >
-              <span className="font-bold text-lg">{group.name}</span>
+              <span className="font-bold text-base">{group.name}</span>
               {activeId === group.id && <Check size={20} className="text-bloom-brown" />}
             </button>
           ))}

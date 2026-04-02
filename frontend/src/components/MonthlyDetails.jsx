@@ -28,7 +28,7 @@ const MonthlyDetail = ({ isOpen, onClose, monthData }) => {
       {/* Transactions List */}
       <main className="flex-1 px-6 pt-10 overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-bloom-brown-dark text-lg">Transactions</h3>
+          <h3 className="font-bold text-bloom-brown-dark text-base">Transactions</h3>
           <span className="bg-bloom-sand px-3 py-1 rounded-full text-bloom-brown text-xs font-bold">
             {monthData.payments.length} Records
           </span>

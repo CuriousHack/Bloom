@@ -49,7 +49,7 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
           <div className="p-2 bg-bloom-sand/20 rounded-xl text-bloom-brown">
             <Users size={20} />
           </div>
-          <h3 className="text-2xl font-black text-bloom-brown-dark">New Society</h3>
+          <h3 className="text-2xl font-bold text-bloom-brown-dark">New Society</h3>
         </div>
         
         <p className="text-sm text-bloom-brown/40 mb-8 font-medium">
@@ -57,14 +57,14 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
         </p>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-bloom-cream/50 p-5 rounded-2xl border border-bloom-brown/10 focus-within:border-bloom-brown/30 transition-colors">
+          <div className="bg-bloom-cream/50 p-4 rounded-2xl border border-bloom-brown/5">
             <input 
               type="text"
               required
               autoFocus
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              className="bg-transparent w-full outline-none text-bloom-brown-dark font-bold text-lg placeholder:text-bloom-brown/20"
+              className="bg-transparent w-full outline-none text-bloom-brown-dark font-semibold text-base placeholder:text-bloom-brown/20"
               placeholder="e.g. December Vacation ✈️"
               disabled={isSubmitting}
             />
@@ -73,7 +73,7 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
           <button 
             type="submit" 
             disabled={isSubmitting || !groupName.trim()}
-            className="w-full bg-bloom-brown text-white py-5 rounded-[2rem] font-black shadow-xl active:scale-95 disabled:opacity-50 disabled:active:scale-100 transition-all flex items-center justify-center gap-2"
+            className="w-full bg-bloom-brown text-white py-5 rounded-[2rem] font-bold shadow-xl active:scale-95 disabled:opacity-50 disabled:active:scale-100 transition-all flex items-center justify-center gap-2"
           >
             {isSubmitting ? "Creating..." : (
               <>
@@ -86,7 +86,7 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
           <button 
             type="button"
             onClick={onClose}
-            className="w-full text-center text-[10px] text-bloom-brown/30 font-black uppercase tracking-widest pt-2"
+            className="w-full text-center text-[10px] text-bloom-brown/30 font-bold uppercase tracking-widest pt-2"
           >
             Cancel
           </button>

@@ -68,7 +68,7 @@ const Transactions = () => {
           <button onClick={() => navigate(-1)} className="p-2 bg-white/10 rounded-full text-white">
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-xl font-black text-white">
+          <h1 className="text-xl font-bold text-white">
             {groupId === 'all' ? 'Global Ledger' : 'Transactions'}
           </h1>
         </div>
@@ -115,16 +115,16 @@ const Transactions = () => {
                 </div>
                 <div>
                   <p className="font-bold text-bloom-brown-dark text-sm">{new Date(p.date).toLocaleDateString()}</p>
-                  <p className="text-[10px] text-bloom-brown/40 uppercase font-black tracking-widest">
+                  <p className="text-[10px] text-bloom-brown/40 uppercase font-bold tracking-widest">
                     {p.cooperativeId?.name || 'Bloom'} • {p.description || 'Contribution'}
                   </p>
                 </div>
               </div>
-              <p className="font-black text-bloom-brown">₦{p.amount.toLocaleString()}</p>
+              <p className="font-bold text-bloom-brown">₦{p.amount.toLocaleString()}</p>
             </div>
           ))
         ) : (
-          <div className="text-center py-20 opacity-20 font-black uppercase tracking-widest">
+          <div className="text-center py-20 opacity-20 font-bold uppercase tracking-widest">
             No results found
           </div>
         )}
