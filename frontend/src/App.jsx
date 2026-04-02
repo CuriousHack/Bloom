@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import Transactions from './pages/Transactions';
 
 // Components
 import UpdatePrompt from './components/UpdatePrompt';
@@ -46,14 +47,7 @@ function App() {
           <Route path="/register" element={<Register />} />
 
           {/* Protected Private Routes */}
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/dashboard" element={ <ProtectedRoute><Dashboard /></ProtectedRoute>}/>
           
           <Route 
             path="/profile" 
@@ -63,6 +57,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          <Route path="/transactions/:groupId" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
 
           {/* Fallback: Redirect any unknown path to login or dashboard */}
           <Route path="*" element={<Navigate to="/" replace />} />

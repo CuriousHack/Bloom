@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+import CreateGroupModal from '../components/CreateGroupModal';
+import AddPaymentModal from '../components/AddPaymentModal';
 
 
 const formatCompactNumber = (number) => {
@@ -26,6 +28,9 @@ const Dashboard = () => {
   const [contributions, setContributions] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   // Fetch all groups on mount
   useEffect(() => {
@@ -56,6 +61,28 @@ const Dashboard = () => {
     } catch (err) {
       toast.error("Error loading history");
     }
+  };
+
+  const handleNewGroupSuccess = (newGroup) => {
+    setGroups(prev => [...prev, newGroup]);
+  };
+
+  const handlePaymentSuccess = (newPayment) => {
+    // Update the local contributions list
+    setContributions(prev => [newPayment, ...prev]);
+    
+    // Update the balance of the current group in the groups list
+    setGroups(prevGroups => prevGroups.map(g => 
+      g._id === selectedGroup._id 
+        ? { ...g, balance: (g.balance || 0) + newPayment.amount }
+        : g
+    ));
+
+    // Also update the selectedGroup state itself so the Header reflects the change
+    setSelectedGroup(prev => ({
+      ...prev,
+      balance: (prev.balance || 0) + newPayment.amount
+    }));
   };
 
   const totalGlobalBalance = groups.reduce((acc, curr) => acc + (curr.balance || 0), 0);
@@ -200,11 +227,35 @@ const formattedBalance = currentDisplayBalance > 9999999
 
       {/* --- FLOATING ACTION BUTTON --- */}
       <button 
-        className="fixed right-6 bottom-[calc(env(safe-area-inset-bottom)+5rem)] bg-bloom-brown-dark text-white w-16 h-16 rounded-[2rem] shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40"
-        onClick={() => {/* Trigger Add Payment or Create Group Modal */}}
+        className="fixed right-6 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] bg-bloom-brown-dark text-white w-16 h-16 rounded-[2rem] shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40"
+        onClick={() => {
+          if (selectedGroup) {
+            setIsPaymentModalOpen(true); // Open payment modal if inside a group
+          } else {
+            setIsGroupModalOpen(true);   // Open group modal if in overview
+          }
+        }}
       >
         <Plus size={32} strokeWidth={3} />
+        
+        {/* Dynamic Floating Label */}
+        <span className="absolute -top-10 bg-bloom-brown text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest animate-bounce shadow-lg">
+          {selectedGroup ? "Add Payment" : "New Group"}
+        </span>
       </button>
+
+        <CreateGroupModal 
+        isOpen={isGroupModalOpen} 
+        onClose={() => setIsGroupModalOpen(false)} 
+        onGroupCreated={handleNewGroupSuccess}
+      />
+
+      <AddPaymentModal 
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        selectedGroup={selectedGroup}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
 
       {/* --- ADAPTIVE BOTTOM NAVIGATION --- */}
 
