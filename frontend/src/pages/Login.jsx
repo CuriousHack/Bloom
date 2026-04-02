@@ -18,6 +18,7 @@ const Login = () => {
     const res = await api.post('/auth/login', formData);
     toast.success(`Welcome back, ${res.data.user.fullName}!`); // Friendly toast
     localStorage.setItem('token', res.data.token);
+    localStorage.setItem('user', JSON.stringify(res.data.user));
     navigate('/dashboard');
   } catch (err) {
     toast.error(err.response?.data?.message || "Login failed");
