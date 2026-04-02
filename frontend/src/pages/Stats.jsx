@@ -33,7 +33,7 @@ const Stats = () => {
     return { ...g, percent, start };
   });
 
-  if (loading) return <div className="h-screen bg-bloom-cream flex items-center justify-center font-black text-bloom-brown">ANALYZING...</div>;
+  if (loading) return <div className="h-screen bg-bloom-cream flex items-center justify-center font-bold text-bloom-brown">ANALYZING...</div>;
 
   return (
     <div className="min-h-screen bg-bloom-cream pb-32">
@@ -43,7 +43,7 @@ const Stats = () => {
           <button onClick={() => navigate(-1)} className="p-2 bg-bloom-sand/20 rounded-full text-bloom-brown">
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-xl font-black text-bloom-brown-dark">Financial Insights</h1>
+          <h1 className="text-xl font-bold text-bloom-brown-dark">Financial Insights</h1>
         </div>
 
         {/* --- CUSTOM RING CHART --- */}
@@ -63,8 +63,8 @@ const Stats = () => {
             ))}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <p className="text-[10px] font-black uppercase text-bloom-brown/30 tracking-widest">Total Wealth</p>
-            <p className="text-xl font-black text-bloom-brown-dark">
+            <p className="text-[10px] font-bold uppercase text-bloom-brown/30 tracking-widest">Total Wealth</p>
+            <p className="text-xl font-bold text-bloom-brown-dark">
               ₦{totalSavings > 1000000 ? (totalSavings / 1000000).toFixed(1) + 'M' : totalSavings.toLocaleString()}
             </p>
           </div>
@@ -90,13 +90,13 @@ const Stats = () => {
 
         {/* --- DISTRIBUTION LIST --- */}
         <div className="bg-white rounded-[2.5rem] p-8 shadow-soft border border-bloom-brown/5">
-          <h3 className="text-sm font-black text-bloom-brown-dark uppercase tracking-widest mb-6">Distribution</h3>
+          <h3 className="text-sm font-bold text-bloom-brown-dark uppercase tracking-widest mb-6">Distribution</h3>
           <div className="space-y-6">
             {segments.map((group, i) => (
               <div key={group._id} className="space-y-2">
                 <div className="flex justify-between items-end">
                   <p className="font-bold text-bloom-brown-dark text-sm">{group.name}</p>
-                  <p className="text-xs font-black text-bloom-brown">{group.percent.toFixed(1)}%</p>
+                  <p className="text-xs font-bold text-bloom-brown">{group.percent.toFixed(1)}%</p>
                 </div>
                 <div className="h-2 w-full bg-bloom-sand/20 rounded-full overflow-hidden">
                   <div 
@@ -119,8 +119,8 @@ const Stats = () => {
 const InsightCard = ({ icon, label, value, sub }) => (
   <div className="bg-white p-6 rounded-[2.5rem] shadow-soft border border-bloom-brown/5">
     <div className="mb-3">{icon}</div>
-    <p className="text-[10px] font-black text-bloom-brown/30 uppercase tracking-widest">{label}</p>
-    <p className="text-xl font-black text-bloom-brown-dark">{value}</p>
+    <p className="text-[10px] font-bold text-bloom-brown/30 uppercase tracking-widest">{label}</p>
+    <p className="text-xl font-bold text-bloom-brown-dark">{value}</p>
     <p className="text-[9px] font-bold text-bloom-brown/40 mt-1">{sub}</p>
   </div>
 );

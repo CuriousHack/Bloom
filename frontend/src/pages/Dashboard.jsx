@@ -87,7 +87,7 @@ const Dashboard = () => {
 
   const totalGlobalBalance = groups.reduce((acc, curr) => acc + (curr.balance || 0), 0);
 
-  if (loading) return <div className="h-screen flex items-center justify-center bg-bloom-cream text-bloom-brown font-black">BLOOMING...</div>;
+  if (loading) return <div className="h-screen flex items-center justify-center bg-bloom-cream text-bloom-brown font-bold">BLOOMING...</div>;
 
 
   const groupByMonth = (data) => {
@@ -143,8 +143,8 @@ const formattedBalance = currentDisplayBalance > 9999999
         <p className="text-bloom-cream/50 text-xs font-medium uppercase tracking-tighter">
           {selectedGroup ? `Total in ${selectedGroup.name}` : "Total Net Savings"}
         </p>
-        <h2 className="text-4xl font-black text-white mt-1 flex items-baseline gap-1 overflow-hidden">
-          <span className="text-2xl opacity-40 shrink-0">₦</span>
+        <h2 className="text-fluid-balance font-bold text-white mt-1 flex items-baseline gap-1 overflow-hidden">
+          <span className="text-xl opacity-40 shrink-0 font-medium">₦</span>
           <span className="truncate">
             {formattedBalance}
           </span>
@@ -156,7 +156,7 @@ const formattedBalance = currentDisplayBalance > 9999999
         {!selectedGroup ? (
           /* VIEW 1: ALL GROUPS DIRECTORY */
           <div className="space-y-4">
-            <h3 className="text-bloom-brown-dark font-black text-sm uppercase tracking-widest ml-2 mb-4">Your Societies</h3>
+            <h3 className="text-bloom-brown-dark font-bold text-sm uppercase tracking-widest ml-2 mb-4">Your Societies</h3>
             {groups.map((group) => (
               <button 
                 key={group._id}
@@ -168,16 +168,18 @@ const formattedBalance = currentDisplayBalance > 9999999
                     <Users size={24} />
                   </div>
                   <div className="text-left">
-                    <h4 className="font-bold text-bloom-brown-dark text-lg">{group.name}</h4>
-                    <p className="text-xs text-bloom-brown/40 font-medium">{group.members?.length || 0} Members</p>
+                    <h4 className="font-bold text-bloom-brown-dark text-base">{group.name}</h4>
+                    <p className="text-[10px] text-bloom-brown/40 font-semibold uppercase tracking-wider">
+                      {group.members?.length || 0} Members
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
-                    <p className="font-black text-bloom-brown text-lg whitespace-nowrap">
-                      {formatCompactNumber(group.balance || 0)}
-                    </p>
-                    <ChevronRight size={18} className="text-bloom-brown/20" />
-                  </div>
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-bloom-brown text-base">
+                    {formatCompactNumber(group.balance || 0)}
+                  </p>
+                  <ChevronRight size={14} className="text-bloom-brown/20" />
+                </div>
               </button>
             ))}
           </div>
@@ -185,7 +187,7 @@ const formattedBalance = currentDisplayBalance > 9999999
           /* VIEW 2: GROUP HISTORY DRILL-DOWN */
             <div className="space-y-6 animate-in slide-in-from-right-10 duration-300">
               <div className="flex justify-between items-center px-2">
-                <h3 className="text-bloom-brown-dark font-black text-sm uppercase tracking-widest">History</h3>
+                <h3 className="text-bloom-brown-dark font-bold text-sm uppercase tracking-widest">History</h3>
                 <button 
                   onClick={() => navigate(`/transactions/${selectedGroup._id}`)}
                   className="text-bloom-brown text-xs font-bold underline"
@@ -206,14 +208,14 @@ const formattedBalance = currentDisplayBalance > 9999999
                         <Calendar size={24} />
                       </div>
                       <div>
-                        <p className="font-black text-bloom-brown-dark text-lg leading-tight">{item.monthYear}</p>
-                        <p className="text-[10px] text-bloom-brown/40 uppercase font-black tracking-widest">
+                        <p className="font-bold text-bloom-brown-dark text-base leading-tight">{item.monthYear}</p>
+                        <p className="text-[10px] text-bloom-brown/40 uppercase font-bold tracking-widest">
                           {item.count} Payments
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-right">
-                      <p className="font-black text-bloom-brown text-lg">₦{item.total.toLocaleString()}</p>
+                      <p className="font-bold text-bloom-brown text-base">₦{item.total.toLocaleString()}</p>
                       <ChevronRight size={18} className="text-bloom-brown/20" />
                     </div>
                   </button>
@@ -239,7 +241,7 @@ const formattedBalance = currentDisplayBalance > 9999999
         <Plus size={32} strokeWidth={3} />
         
         {/* Dynamic Floating Label */}
-        <span className="absolute -top-10 bg-bloom-brown text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest animate-bounce shadow-lg">
+        <span className="absolute -top-10 bg-bloom-brown text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest animate-bounce shadow-lg">
           {selectedGroup ? "Add Payment" : "New Group"}
         </span>
       </button>
@@ -279,7 +281,7 @@ const formattedBalance = currentDisplayBalance > 9999999
 const NavIcon = ({ icon, label, active }) => (
   <div className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-bloom-brown scale-110' : 'text-bloom-brown/30'}`}>
     {icon}
-    <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+    <span className="text-[9px] font-bold uppercase tracking-widest">{label}</span>
   </div>
 );
 

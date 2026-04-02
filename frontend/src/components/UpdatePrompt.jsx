@@ -25,14 +25,14 @@ const UpdatePrompt = () => {
           </div>
           <div>
             <p className="text-xs font-bold">New Version Available</p>
-            <p className="text-[10px] opacity-60 uppercase font-black">Update Bloom now</p>
+            <p className="text-[10px] opacity-60 uppercase font-bold">Update Bloom now</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => updateServiceWorker(true)}
-            className="bg-bloom-cream text-bloom-brown-dark px-4 py-2 rounded-xl text-[10px] font-black uppercase"
+            className="bg-bloom-cream text-bloom-brown-dark px-4 py-2 rounded-xl text-[10px] font-bold uppercase"
           >
             Update
           </button>

@@ -57,7 +57,7 @@ const AddPaymentModal = ({ isOpen, onClose, selectedGroup, onPaymentSuccess }) =
           <div className="p-2 bg-green-100 rounded-xl text-green-700">
             <Wallet size={20} />
           </div>
-          <h3 className="text-2xl font-black text-bloom-brown-dark">Add Payment</h3>
+          <h3 className="text-2xl font-bold text-bloom-brown-dark">Add Payment</h3>
         </div>
         
         <p className="text-sm text-bloom-brown/40 mb-8 font-medium">
@@ -66,16 +66,15 @@ const AddPaymentModal = ({ isOpen, onClose, selectedGroup, onPaymentSuccess }) =
         
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Amount Input */}
-          <div className="bg-bloom-cream/50 p-5 rounded-2xl border border-bloom-brown/10 flex items-center gap-4">
-            <span className="text-2xl font-black text-bloom-brown/30">₦</span>
+          <div className="bg-bloom-cream/50 p-4 rounded-2xl border border-bloom-brown/5">
+            <span className="text-2xl font-bold text-bloom-brown/30">₦</span>
             <input 
               type="number"
               required
               autoFocus
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="bg-transparent w-full outline-none text-bloom-brown-dark font-black text-2xl placeholder:text-bloom-brown/10"
-              placeholder="0.00"
+              className="bg-transparent w-full outline-none text-bloom-brown-dark font-semibold text-base placeholder:text-bloom-brown/20"              placeholder="0.00"
               disabled={isSubmitting}
             />
           </div>
@@ -96,7 +95,7 @@ const AddPaymentModal = ({ isOpen, onClose, selectedGroup, onPaymentSuccess }) =
           <button 
             type="submit" 
             disabled={isSubmitting || !amount}
-            className="w-full bg-bloom-brown text-white py-5 rounded-[2rem] font-black shadow-xl active:scale-95 disabled:opacity-50 transition-all mt-4"
+            className="w-full bg-bloom-brown text-white py-5 rounded-[2rem] font-bold shadow-xl active:scale-95 disabled:opacity-50 transition-all mt-4"
           >
             {isSubmitting ? "Processing..." : "Confirm Payment"}
           </button>
