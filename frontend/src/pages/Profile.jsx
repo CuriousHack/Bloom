@@ -143,7 +143,7 @@ const Profile = () => {
 
       {/* --- FOOTER INFO --- */}
       <div className="text-center mt-8 px-8">
-        <p className="text-[10px] text-bloom-brown/30 font-black uppercase tracking-[0.2em]">Bloom v2.0.4 Premium</p>
+        <p className="text-[10px] text-bloom-brown/30 font-black uppercase tracking-[0.2em]">Bloom v2.0.0</p>
         <p className="text-[10px] text-bloom-brown/20 mt-1 font-medium italic">Crafted for cooperative growth</p>
       </div>
     </div>

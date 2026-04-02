@@ -264,9 +264,9 @@ const formattedBalance = currentDisplayBalance > 9999999
             <NavIcon icon={<Home size={24} />} label="Home" active={!selectedGroup} />
           </Link>
           
-          <div className="opacity-30 pointer-events-none">
-            <NavIcon icon={<PieChart size={24} />} label="Stats" />
-          </div>
+          <Link to="/stats">
+            <NavIcon icon={<PieChart size={24} />} label="Stats" active={location.pathname === '/stats'} />
+          </Link>
 
           <Link to="/profile">
             <NavIcon icon={<User size={24} />} label="Profile" active={false} />

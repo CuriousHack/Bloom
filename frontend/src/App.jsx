@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Transactions from './pages/Transactions';
+import Stats from './pages/Stats';
 
 // Components
 import UpdatePrompt from './components/UpdatePrompt';
@@ -58,6 +59,11 @@ function App() {
             } 
           />
           <Route path="/transactions/:groupId" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+
+          <Route 
+            path="/stats" 
+            element={<ProtectedRoute><Stats /></ProtectedRoute>} 
+          />
 
           {/* Fallback: Redirect any unknown path to login or dashboard */}
           <Route path="*" element={<Navigate to="/" replace />} />
