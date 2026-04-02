@@ -1,256 +1,286 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, Calendar, ChevronRight, ChevronDown, 
-  LogOut, Wallet, Loader2, PlusCircle 
-} from 'lucide-react';
+import { Plus, ChevronRight, Wallet, Calendar, Users,ListTree, ArrowLeft, User, Home, PieChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
-
-// Component Imports
-import AddPaymentModal from '../components/AddPaymentModal';
-import MonthlyDetail from '../components/MonthlyDetails';
-import CoopSwitcher from '../components/CoopSwitcher';
 import CreateGroupModal from '../components/CreateGroupModal';
+import AddPaymentModal from '../components/AddPaymentModal';
+
+
+const formatCompactNumber = (number) => {
+  if (number < 1000) return `₦${number}`;
+  
+  const formatter = Intl.NumberFormat('en-US', {
+    notation: "compact",
+    compactDisplay: "short",
+    maximumFractionDigits: 1
+  });
+  
+  // We manually add the Naira symbol back because 'compact' notation 
+  // sometimes struggles with non-standard currency symbols in certain browsers
+  return `₦${formatter.format(number).replace('T', 'K')}`; 
+};
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  
-  // Data State
   const [groups, setGroups] = useState([]);
-  const [activeCoop, setActiveCoop] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null); // The "Drill Down" state
   const [contributions, setContributions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-  // UI State
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
-  const [showCoopSwitcher, setShowCoopSwitcher] = useState(false);
-  const [selectedMonthData, setSelectedMonthData] = useState(null);
-
-  // 1. Fetch all cooperatives on mount
+  // Fetch all groups on mount
   useEffect(() => {
-    fetchInitialData();
+    fetchGroups();
   }, []);
 
-  // 2. Fetch contributions whenever the active group changes
+  // Fetch contributions whenever a specific group is selected
   useEffect(() => {
-    if (activeCoop?._id) {
-      fetchContributions(activeCoop._id);
+    if (selectedGroup) {
+      fetchContributions(selectedGroup._id);
     }
-  }, [activeCoop]);
+  }, [selectedGroup]);
 
-  const fetchInitialData = async () => {
+  const fetchGroups = async () => {
     try {
       const res = await api.get('/cooperatives');
       setGroups(res.data);
-      if (res.data.length > 0) {
-        setActiveCoop(res.data[0]);
-      }
-    } catch (err) {
-      console.error("Failed to load groups", err);
-      toast.error("Failed to load groups. Please try again later.");
-    } finally {
       setLoading(false);
+    } catch (err) {
+      toast.error("Failed to load your groups");
     }
   };
 
-  const fetchContributions = async (coopId) => {
+  const fetchContributions = async (groupId) => {
     try {
-      const res = await api.get(`/contributions/${coopId}`);
-      toast.success("Contributions loaded successfully! 🌟");
+      const res = await api.get(`/contributions/${groupId}`);
       setContributions(res.data);
     } catch (err) {
-        toast.error("Failed to load contributions. Please try again later.");
-        console.error("Failed to load contributions", err);
+      toast.error("Error loading history");
     }
   };
 
-  const handleLogout = () => {
-    // 1. Clear local storage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
-    // 2. Show success toast
-    toast.success("Logged out successfully. See you soon! 👋", {
-        icon: '🤎', // Custom brown heart icon to match theme
-    });
-
-    // 3. Redirect to Login
-    navigate('/');
-    };
-
-  // 3. Helper: Group raw contributions into Monthly Buckets
-  const getMonthlySummary = () => {
-    const groups = {};
-    contributions.forEach(c => {
-      const key = c.monthKey || "Other";
-      if (!groups[key]) groups[key] = { month: key, total: 0, payments: [] };
-      groups[key].total += c.amount;
-      groups[key].payments.push(c);
-    });
-    return Object.values(groups);
+  const handleNewGroupSuccess = (newGroup) => {
+    setGroups(prev => [...prev, newGroup]);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-bloom-cream flex items-center justify-center">
-        <Loader2 className="animate-spin text-bloom-brown" size={40} />
-      </div>
-    );
-  }
+  const handlePaymentSuccess = (newPayment) => {
+    // Update the local contributions list
+    setContributions(prev => [newPayment, ...prev]);
+    
+    // Update the balance of the current group in the groups list
+    setGroups(prevGroups => prevGroups.map(g => 
+      g._id === selectedGroup._id 
+        ? { ...g, balance: (g.balance || 0) + newPayment.amount }
+        : g
+    ));
 
-  const monthlyHistory = getMonthlySummary();
+    // Also update the selectedGroup state itself so the Header reflects the change
+    setSelectedGroup(prev => ({
+      ...prev,
+      balance: (prev.balance || 0) + newPayment.amount
+    }));
+  };
 
-  const currentBalance = contributions.reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const totalGlobalBalance = groups.reduce((acc, curr) => acc + (curr.balance || 0), 0);
+
+  if (loading) return <div className="h-screen flex items-center justify-center bg-bloom-cream text-bloom-brown font-black">BLOOMING...</div>;
 
 
+  const groupByMonth = (data) => {
+    return data.reduce((acc, contribution) => {
+      const date = new Date(contribution.date);
+      const monthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+      
+      if (!acc[monthYear]) {
+        acc[monthYear] = {
+          monthYear,
+          total: 0,
+          count: 0,
+          payments: []
+        };
+      }
+      
+      acc[monthYear].total += contribution.amount;
+      acc[monthYear].count += 1;
+      acc[monthYear].payments.push(contribution);
+      return acc;
+    }, {});
+  };
+
+  const monthlyData = selectedGroup ? Object.values(groupByMonth(contributions)) : [];
+  const currentDisplayBalance = selectedGroup ? (selectedGroup.balance || 0) : totalGlobalBalance;
+
+// We use compact formatting only for very large numbers (e.g., > 10M) 
+// to keep the header readable on small screens.
+const formattedBalance = currentDisplayBalance > 9999999 
+  ? formatCompactNumber(currentDisplayBalance) 
+  : currentDisplayBalance.toLocaleString();
   return (
-    <div className="min-h-screen bg-bloom-cream pb-24 font-sans">
-      {/* Header Section */}
-      <header className="bg-bloom-brown px-8 rounded-b-[3.5rem] shadow-xl relative z-10 pt-[calc(env(safe-area-inset-top)+2rem)] pb-12">
-        <div className="flex justify-between items-start mb-8">
-          {activeCoop ? (
-            <button 
-              onClick={() => setShowCoopSwitcher(true)}
-              className="flex items-center gap-2 bg-white/10 px-4 py-2.5 rounded-2xl backdrop-blur-md border border-white/5 active:scale-95 transition-all"
-            >
-              <div className="w-6 h-6 bg-bloom-cream rounded-lg flex items-center justify-center shadow-inner">
-                <span className="text-bloom-brown text-[10px] font-black uppercase">
-                  {activeCoop.name[0]}
-                </span>
-              </div>
-              <span className="text-bloom-cream font-bold text-sm tracking-tight">{activeCoop.name}</span>
-              <ChevronDown size={16} className="text-bloom-cream/40" />
+    <div className="min-h-screen bg-bloom-cream pb-32">
+      {/* --- ADAPTIVE HEADER --- */}
+      <header className="bg-bloom-brown pt-[calc(env(safe-area-inset-top)+2rem)] pb-12 px-8 rounded-b-[3.5rem] shadow-2xl relative z-10">
+        <div className="flex justify-between items-center mb-6">
+          {selectedGroup ? (
+            <button onClick={() => setSelectedGroup(null)} className="p-2 bg-white/10 rounded-full text-white">
+              <ArrowLeft size={20} />
             </button>
           ) : (
-            <div className="text-bloom-cream/80 font-bold italic">Bloom</div>
+            <div className="bg-bloom-cream/20 px-4 py-1 rounded-full text-[10px] text-bloom-cream font-bold uppercase tracking-widest">
+              Overview
+            </div>
           )}
-          
           <button 
-            onClick={handleLogout}
-            className="p-2.5 bg-white/10 rounded-2xl text-white hover:bg-white/20 transition-colors"
-          >
-            <LogOut size={20} />
+            onClick={() => navigate('/transactions/all')} 
+            className="w-10 h-10 bg-bloom-cream rounded-2xl flex items-center justify-center text-bloom-brown shadow-lg active:scale-90 transition-transform">
+            <ListTree size={20} /> {/* Or use History / LayoutList */}
           </button>
         </div>
 
-        <div className="animate-in fade-in slide-in-from-top-4 duration-700">
-          <p className="text-bloom-cream/50 text-[10px] uppercase tracking-[0.3em] font-black">
-            Available Balance
-          </p>
-          <h2 className="text-4xl font-bold text-white mt-1.5 flex items-baseline gap-1">
-            <span className="text-2xl opacity-60 font-medium">₦</span>
-            {currentBalance.toLocaleString()}
-          </h2>
-        </div>
+        <p className="text-bloom-cream/50 text-xs font-medium uppercase tracking-tighter">
+          {selectedGroup ? `Total in ${selectedGroup.name}` : "Total Net Savings"}
+        </p>
+        <h2 className="text-4xl font-black text-white mt-1 flex items-baseline gap-1 overflow-hidden">
+          <span className="text-2xl opacity-40 shrink-0">₦</span>
+          <span className="truncate">
+            {formattedBalance}
+          </span>
+        </h2>
       </header>
 
-      {/* Main Content Area */}
-      <main className="px-6 -mt-8 relative z-20">
-        <div className="bg-white rounded-[3rem] p-7 shadow-soft min-h-[500px] border border-bloom-brown/5">
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="font-extrabold text-bloom-brown-dark text-xl">History</h3>
-            <div className="w-8 h-8 bg-bloom-sand/50 rounded-full flex items-center justify-center">
-               <Wallet size={16} className="text-bloom-brown" />
-            </div>
-          </div>
-
-          {/* List of Monthly Records */}
+      {/* --- MAIN CONTENT --- */}
+      <main className="px-6 -mt-6 relative z-20">
+        {!selectedGroup ? (
+          /* VIEW 1: ALL GROUPS DIRECTORY */
           <div className="space-y-4">
-            {activeCoop ? (
-              monthlyHistory.length > 0 ? (
-                monthlyHistory.map((group, idx) => (
+            <h3 className="text-bloom-brown-dark font-black text-sm uppercase tracking-widest ml-2 mb-4">Your Societies</h3>
+            {groups.map((group) => (
+              <button 
+                key={group._id}
+                onClick={() => setSelectedGroup(group)}
+                className="w-full bg-white p-6 rounded-[2.5rem] shadow-soft border border-bloom-brown/5 flex justify-between items-center active:scale-95 transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-bloom-sand/20 rounded-2xl flex items-center justify-center text-bloom-brown">
+                    <Users size={24} />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-bold text-bloom-brown-dark text-lg">{group.name}</h4>
+                    <p className="text-xs text-bloom-brown/40 font-medium">{group.members?.length || 0} Members</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                    <p className="font-black text-bloom-brown text-lg whitespace-nowrap">
+                      {formatCompactNumber(group.balance || 0)}
+                    </p>
+                    <ChevronRight size={18} className="text-bloom-brown/20" />
+                  </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          /* VIEW 2: GROUP HISTORY DRILL-DOWN */
+            <div className="space-y-6 animate-in slide-in-from-right-10 duration-300">
+              <div className="flex justify-between items-center px-2">
+                <h3 className="text-bloom-brown-dark font-black text-sm uppercase tracking-widest">History</h3>
+                <button 
+                  onClick={() => navigate(`/transactions/${selectedGroup._id}`)}
+                  className="text-bloom-brown text-xs font-bold underline"
+                >
+                  View All
+                </button>
+              </div>
+              
+              {monthlyData.length > 0 ? (
+                monthlyData.map((item) => (
                   <button 
-                    key={idx}
-                    onClick={() => setSelectedMonthData(group)}
-                    className="w-full flex items-center justify-between p-5 bg-bloom-sand/20 rounded-[2.5rem] border border-transparent active:border-bloom-brown/10 active:bg-bloom-sand/40 transition-all group"
+                    key={item.monthYear}
+                    onClick={() => navigate(`/transactions/${selectedGroup._id}?month=${item.monthYear}`)}
+                    className="w-full bg-white/80 p-6 rounded-[2.5rem] border border-bloom-brown/5 flex justify-between items-center active:scale-95 transition-all shadow-sm"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm group-active:shadow-none transition-shadow">
-                        <Calendar className="text-bloom-brown" size={20} />
+                    <div className="flex items-center gap-4 text-left">
+                      <div className="w-12 h-12 bg-bloom-sand/20 rounded-2xl flex items-center justify-center text-bloom-brown">
+                        <Calendar size={24} />
                       </div>
-                      <div className="text-left">
-                        <p className="font-bold text-bloom-brown-dark">{group.month}</p>
-                        <p className="text-xs text-bloom-brown/50 font-semibold">{group.payments.length} Payments</p>
+                      <div>
+                        <p className="font-black text-bloom-brown-dark text-lg leading-tight">{item.monthYear}</p>
+                        <p className="text-[10px] text-bloom-brown/40 uppercase font-black tracking-widest">
+                          {item.count} Payments
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-bloom-brown text-lg">₦{group.total.toLocaleString()}</p>
-                      <ChevronRight size={18} className="text-bloom-brown/30" />
+                    <div className="flex items-center gap-2 text-right">
+                      <p className="font-black text-bloom-brown text-lg">₦{item.total.toLocaleString()}</p>
+                      <ChevronRight size={18} className="text-bloom-brown/20" />
                     </div>
                   </button>
                 ))
               ) : (
-                <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
-                  <div className="w-20 h-20 bg-bloom-sand rounded-full flex items-center justify-center mb-4">
-                    <PlusCircle size={32} className="text-bloom-brown" />
-                  </div>
-                  <p className="font-bold">No Records Found</p>
-                  <p className="text-xs">Tap the + to add a payment</p>
-                </div>
-              )
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <p className="text-bloom-brown/60 mb-6 font-medium">You haven't joined any groups yet.</p>
-                <button 
-                  onClick={() => setIsCreateGroupOpen(true)}
-                  className="bg-bloom-brown text-white px-10 py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"
-                >
-                  Create Your First Group
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+                <div className="text-center py-20 opacity-30 font-bold">No contributions for this group.</div>
+              )}
+            </div>
+        )}
       </main>
 
-      {/* Floating Action Button */}
-      {activeCoop && (
-        <button 
-          onClick={() => setIsAddModalOpen(true)}
-          className="fixed right-8 bg-bloom-brown-dark text-white rounded-[2rem] shadow-2xl bottom-[calc(env(safe-area-inset-bottom)+2rem)] w-16 h-16 flex items-center justify-center z-40"
-        >
-          <Plus size={32} strokeWidth={3} />
-        </button>
-      )}
+      {/* --- FLOATING ACTION BUTTON --- */}
+      <button 
+        className="fixed right-6 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] bg-bloom-brown-dark text-white w-16 h-16 rounded-[2rem] shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40"
+        onClick={() => {
+          if (selectedGroup) {
+            setIsPaymentModalOpen(true); // Open payment modal if inside a group
+          } else {
+            setIsGroupModalOpen(true);   // Open group modal if in overview
+          }
+        }}
+      >
+        <Plus size={32} strokeWidth={3} />
+        
+        {/* Dynamic Floating Label */}
+        <span className="absolute -top-10 bg-bloom-brown text-white text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest animate-bounce shadow-lg">
+          {selectedGroup ? "Add Payment" : "New Group"}
+        </span>
+      </button>
 
-      {/* Modals & Overlays */}
+        <CreateGroupModal 
+        isOpen={isGroupModalOpen} 
+        onClose={() => setIsGroupModalOpen(false)} 
+        onGroupCreated={handleNewGroupSuccess}
+      />
+
       <AddPaymentModal 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
-        activeCoopId={activeCoop?._id}
-        onPaymentAdded={(newPayment) => {
-          setContributions([newPayment, ...contributions]);
-          setActiveCoop({...activeCoop, balance: (activeCoop.balance || 0) + Number(newPayment.amount)});
-        }}
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        selectedGroup={selectedGroup}
+        onPaymentSuccess={handlePaymentSuccess}
       />
 
-      <MonthlyDetail 
-        isOpen={!!selectedMonthData} 
-        onClose={() => setSelectedMonthData(null)} 
-        monthData={selectedMonthData} 
-      />
+      {/* --- ADAPTIVE BOTTOM NAVIGATION --- */}
 
-      <CoopSwitcher 
-        isOpen={showCoopSwitcher}
-        onClose={() => setShowCoopSwitcher(false)}
-        groups={groups}
-        activeId={activeCoop?._id}
-        onSelect={(group) => setActiveCoop(group)}
-        openCreateModal={() => setIsCreateGroupOpen(true)}
-      />
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-bloom-brown/5 px-8 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] flex justify-between items-center z-50">
+          <Link to="/dashboard">
+            <NavIcon icon={<Home size={24} />} label="Home" active={!selectedGroup} />
+          </Link>
+          
+          <Link to="/stats">
+            <NavIcon icon={<PieChart size={24} />} label="Stats" active={location.pathname === '/stats'} />
+          </Link>
 
-      <CreateGroupModal 
-        isOpen={isCreateGroupOpen} 
-        onClose={() => setIsCreateGroupOpen(false)} 
-        onGroupCreated={(newGroup) => {
-          setGroups([...groups, newGroup]);
-          setActiveCoop(newGroup);
-        }}
-      />
+          <Link to="/profile">
+            <NavIcon icon={<User size={24} />} label="Profile" active={false} />
+          </Link>
+        </nav>
     </div>
   );
 };
+
+const NavIcon = ({ icon, label, active }) => (
+  <div className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-bloom-brown scale-110' : 'text-bloom-brown/30'}`}>
+    {icon}
+    <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+  </div>
+);
 
 export default Dashboard;

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 // @route   POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -37,6 +38,30 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   PUT /api/auth/profile
+// @desc    Update user profile
+router.put('/profile', auth, async (req, res) => {
+  try {
+    const { fullName } = req.body;
+    const user = await User.findById(req.user.userId);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (fullName) user.fullName = fullName;
+    
+    await user.save();
+
+    // Return updated user (excluding password)
+    res.json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email
+    });
+  } catch (err) {
+    res.status(500).send('Server Error');
   }
 });
 

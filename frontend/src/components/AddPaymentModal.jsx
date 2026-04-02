@@ -1,104 +1,104 @@
 import React, { useState } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { Wallet, X, Banknote, Calendar as CalIcon } from 'lucide-react';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 
-const AddPaymentModal = ({ isOpen, onClose, activeCoopId, onPaymentAdded }) => {
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    amount: '',
-    date: new Date().toISOString().split('T')[0], // Default to today
-    description: ''
-  });
+const AddPaymentModal = ({ isOpen, onClose, selectedGroup, onPaymentSuccess }) => {
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
- 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  // Use a promise-based toast for better UX
-  const savingPromise = api.post('/contributions', { ...formData, cooperativeId: activeCoopId });
+    e.preventDefault();
+    if (!amount || amount <= 0) return toast.error("Enter a valid amount");
 
-  toast.promise(savingPromise, {
-    loading: 'Recording payment...',
-    success: (res) => {
-      onPaymentAdded(res.data);
+    setIsSubmitting(true);
+    const loadingToast = toast.loading("Recording your contribution...");
+
+    try {
+      const res = await api.post('/contributions', {
+        cooperativeId: selectedGroup._id,
+        amount: Number(amount),
+        description: description || `Monthly contribution to ${selectedGroup.name}`,
+        date: new Date()
+      });
+
+      toast.success("Payment Recorded! 💰", { id: loadingToast });
+      
+      // Trigger refresh in the parent Dashboard
+      onPaymentSuccess(res.data); 
+      
+      // Reset and close
+      setAmount("");
+      setDescription("");
       onClose();
-      return 'Payment saved successfully! 💰';
-    },
-    error: (err) => err.response?.data?.message || 'Could not save payment',
-  });
-};
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Payment failed", { id: loadingToast });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-bloom-brown-dark/40 backdrop-blur-[2px]">
-      {/* Clickable Backdrop */}
-      <div className="absolute inset-0" onClick={onClose}></div>
-
-      {/* Slide-up Content */}
-      <div className="relative w-full max-w-md bg-white rounded-t-[3rem] p-8 shadow-2xl animate-in slide-in-from-bottom duration-300">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-bloom-brown-dark">Add Contribution</h2>
-          <button onClick={onClose} className="p-2 bg-bloom-sand rounded-full text-bloom-brown active:scale-90 transition-transform">
-            <X size={20} />
-          </button>
+    <div className="fixed inset-0 z-[100] flex items-end justify-center">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-bloom-brown-dark/60 backdrop-blur-sm animate-in fade-in duration-300"
+        onClick={onClose}
+      />
+      
+      {/* Slide-up Sheet */}
+      <div className="relative bg-white w-full max-w-lg rounded-t-[3.5rem] p-10 pb-[calc(env(safe-area-inset-bottom)+2rem)] animate-in slide-in-from-bottom duration-500 shadow-2xl">
+        <div className="w-12 h-1.5 bg-bloom-sand/50 rounded-full mx-auto mb-8" />
+        
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 bg-green-100 rounded-xl text-green-700">
+            <Wallet size={20} />
+          </div>
+          <h3 className="text-2xl font-black text-bloom-brown-dark">Add Payment</h3>
         </div>
         
-        <form onSubmit={handleSubmit} className="space-y-6 pb-[env(safe-area-inset-bottom)]">
+        <p className="text-sm text-bloom-brown/40 mb-8 font-medium">
+          Contributing to <span className="text-bloom-brown font-bold">{selectedGroup?.name}</span>
+        </p>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Amount Input */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Amount Paid</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-bloom-brown-dark text-lg">₦</span>
-              <input 
-                type="number" 
-                placeholder="0.00"
-                value={formData.amount}
-                onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                className="w-full bg-bloom-sand/30 border-none py-5 pl-10 pr-4 rounded-2xl text-xl font-bold focus:ring-2 focus:ring-bloom-brown/20 outline-none transition-all placeholder:text-bloom-brown/20"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Date Input */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Payment Date</label>
+          <div className="bg-bloom-cream/50 p-5 rounded-2xl border border-bloom-brown/10 flex items-center gap-4">
+            <span className="text-2xl font-black text-bloom-brown/30">₦</span>
             <input 
-              type="date" 
-              value={formData.date}
-              onChange={(e) => setFormData({...formData, date: e.target.value})}
-              className="w-full bg-bloom-sand/30 border-none py-4 px-4 rounded-2xl font-semibold text-bloom-brown-dark focus:ring-2 focus:ring-bloom-brown/20 outline-none"
+              type="number"
               required
+              autoFocus
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="bg-transparent w-full outline-none text-bloom-brown-dark font-black text-2xl placeholder:text-bloom-brown/10"
+              placeholder="0.00"
+              disabled={isSubmitting}
             />
           </div>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Description / Note</label>
-            <textarea 
-              placeholder="e.g. Mid-month meeting contribution"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full bg-bloom-sand/30 border-none py-4 px-4 rounded-2xl font-medium focus:ring-2 focus:ring-bloom-brown/20 outline-none h-24 resize-none placeholder:text-bloom-brown/30"
-            ></textarea>
+          {/* Description Input */}
+          <div className="bg-bloom-cream/20 p-4 rounded-2xl border border-bloom-brown/5 flex items-center gap-3">
+            <Banknote size={18} className="text-bloom-brown/30" />
+            <input 
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="bg-transparent w-full outline-none text-bloom-brown-dark font-bold text-sm"
+              placeholder="What is this for? (Optional)"
+              disabled={isSubmitting}
+            />
           </div>
-
-          {/* Submit Button */}
+          
           <button 
-            type="submit"
-            disabled={loading}
-            className="w-full bg-bloom-brown hover:bg-bloom-brown-dark text-white py-5 rounded-2xl font-bold shadow-lg shadow-bloom-brown/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+            type="submit" 
+            disabled={isSubmitting || !amount}
+            className="w-full bg-bloom-brown text-white py-5 rounded-[2rem] font-black shadow-xl active:scale-95 disabled:opacity-50 transition-all mt-4"
           >
-            {loading ? (
-              <>
-                <Loader2 className="animate-spin" size={20} />
-                <span>Saving...</span>
-              </>
-            ) : (
-              "Confirm & Save"
-            )}
+            {isSubmitting ? "Processing..." : "Confirm Payment"}
           </button>
         </form>
       </div>

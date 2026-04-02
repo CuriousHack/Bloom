@@ -1,7 +1,9 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
+  "description": "Bloom - Personal Finance Manager for Savings Groups",
+  "version-note": "Initial release of Bloom v2.0.0 with new features and improvements",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -39,4 +39,17 @@ router.get('/:cooperativeId', auth, async (req, res) => {
   }
 });
 
+router.get('/', auth, async (req, res) => {
+  try {
+    // Find all contributions where the user is the payer
+    const contributions = await Contribution.find({ user: req.user.userId })
+      .populate('cooperative', 'name') // Pull group names for the UI
+      .sort({ date: -1 });
+    res.json(contributions);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;
