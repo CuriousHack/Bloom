@@ -104,16 +104,11 @@ const Dashboard = () => {
 
   const currentBalance = contributions.reduce((acc, curr) => acc + Number(curr.amount), 0);
 
-    // Update your Header JSX to use this calculated 'currentBalance'
-    // <h2 className="text-4xl font-bold text-white mt-1 flex items-baseline gap-1">
-    // <span className="text-2xl opacity-60 font-medium">₦</span>
-    // {currentBalance.toLocaleString()}
-    // </h2>
 
   return (
     <div className="min-h-screen bg-bloom-cream pb-24 font-sans">
       {/* Header Section */}
-      <header className="bg-bloom-brown pt-16 pb-12 px-8 rounded-b-[3.5rem] shadow-xl relative z-10">
+      <header className="bg-bloom-brown px-8 rounded-b-[3.5rem] shadow-xl relative z-10 pt-[calc(env(safe-area-inset-top)+2rem)] pb-12">
         <div className="flex justify-between items-start mb-8">
           {activeCoop ? (
             <button 
@@ -154,7 +149,7 @@ const Dashboard = () => {
       {/* Main Content Area */}
       <main className="px-6 -mt-8 relative z-20">
         <div className="bg-white rounded-[3rem] p-7 shadow-soft min-h-[500px] border border-bloom-brown/5">
-          <div className="flex justify-between items-center mb-8 px-2">
+          <div className="flex justify-between items-center mb-8">
             <h3 className="font-extrabold text-bloom-brown-dark text-xl">History</h3>
             <div className="w-8 h-8 bg-bloom-sand/50 rounded-full flex items-center justify-center">
                <Wallet size={16} className="text-bloom-brown" />
@@ -214,7 +209,7 @@ const Dashboard = () => {
       {activeCoop && (
         <button 
           onClick={() => setIsAddModalOpen(true)}
-          className="fixed bottom-10 right-8 w-16 h-16 bg-bloom-brown-dark text-white rounded-[2rem] shadow-2xl flex items-center justify-center active:scale-90 active:rotate-90 transition-all z-40"
+          className="fixed right-8 bg-bloom-brown-dark text-white rounded-[2rem] shadow-2xl bottom-[calc(env(safe-area-inset-bottom)+2rem)] w-16 h-16 flex items-center justify-center z-40"
         >
           <Plus size={32} strokeWidth={3} />
         </button>

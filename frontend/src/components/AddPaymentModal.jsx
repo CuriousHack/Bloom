@@ -44,8 +44,8 @@ const AddPaymentModal = ({ isOpen, onClose, activeCoopId, onPaymentAdded }) => {
             <X size={20} />
           </button>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+        
+        <form onSubmit={handleSubmit} className="space-y-6 pb-[env(safe-area-inset-bottom)]">
           {/* Amount Input */}
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-bloom-brown/60 ml-1">Amount Paid</label>

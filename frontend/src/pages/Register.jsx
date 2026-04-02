@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import api from '../api/axios';
 
 const Register = () => {
@@ -45,14 +46,6 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-bloom-cream flex flex-col items-center justify-center px-6 py-10">
       
-      {/* Back Button for Mobile UX */}
-      <button 
-        onClick={() => navigate('/dashboard')}
-        className="self-start mb-6 flex items-center text-bloom-brown-dark font-semibold gap-2 active:scale-95 transition-transform"
-      >
-        <ArrowLeft size={20} />
-        <span>Back to Login</span>
-      </button>
 
       {/* Header */}
       <div className="mb-8 text-center">

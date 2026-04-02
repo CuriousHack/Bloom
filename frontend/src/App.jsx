@@ -26,6 +26,9 @@ function App() {
   return (
     <Router>
       <Toaster 
+        containerStyle={{
+          top: 'calc(env(safe-area-inset-top) + 12px)', // Floats just below the punch hole
+        }}
         toastOptions={{
           className: 'border border-bloom-brown/10',
           success: {
