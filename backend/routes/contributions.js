@@ -52,4 +52,25 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// @route   PUT /api/contributions/:id
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { amount, description, date } = req.body;
+    let contribution = await Contribution.findById(req.params.id);
+
+    if (!contribution) return res.status(404).json({ message: "Payment not found" });
+    if (contribution.user.toString() !== req.user.userId) return res.status(401).json({ message: "Unauthorized" });
+
+    // Update fields
+    if (amount) contribution.amount = amount;
+    if (description) contribution.description = description;
+    if (date) contribution.date = date;
+
+    await contribution.save();
+    res.json(contribution);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;

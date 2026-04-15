@@ -7,6 +7,7 @@ const AddPaymentModal = ({ isOpen, onClose, selectedGroup, onPaymentSuccess }) =
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ const AddPaymentModal = ({ isOpen, onClose, selectedGroup, onPaymentSuccess }) =
         cooperativeId: selectedGroup._id,
         amount: Number(amount),
         description: description || `Monthly contribution to ${selectedGroup.name}`,
-        date: new Date()
+        date: date || new Date().toISOString()
       });
 
       toast.success("Payment Recorded! 💰", { id: loadingToast });
@@ -75,6 +76,18 @@ const AddPaymentModal = ({ isOpen, onClose, selectedGroup, onPaymentSuccess }) =
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="bg-transparent w-full outline-none text-bloom-brown-dark font-semibold text-base placeholder:text-bloom-brown/20"              placeholder="0.00"
+              disabled={isSubmitting}
+            />
+          </div>
+
+        {/* Date input  */}
+          <div className="bg-bloom-cream/20 p-4 rounded-2xl border border-bloom-brown/5 flex items-center gap-3">
+            <CalIcon size={18} className="text-bloom-brown/30" />
+            <input 
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="bg-transparent w-full outline-none text-bloom-brown-dark font-semibold text-sm"
               disabled={isSubmitting}
             />
           </div>

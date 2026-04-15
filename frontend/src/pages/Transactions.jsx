@@ -2,12 +2,14 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Wallet, Search, Filter, Calendar as CalendarIcon, Users } from 'lucide-react';
 import api from '../api/axios';
+import EditTransactionModal from '../components/EditTransactionModal';
 
 const Transactions = () => {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const [allPayments, setAllPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTx, setSelectedTx] = useState(null);
   
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState("");
@@ -113,7 +115,9 @@ const Transactions = () => {
                 <div className="w-10 h-10 bg-bloom-sand/20 rounded-xl flex items-center justify-center text-bloom-brown">
                   <Wallet size={20} />
                 </div>
-                <div>
+                <div key={p._id} 
+                  onClick={() => setSelectedTx(p)}
+                  className="active:scale-95 transition-transform cursor-pointer ...">
                   <p className="font-bold text-bloom-brown-dark text-sm">{new Date(p.date).toLocaleDateString()}</p>
                   <p className="text-[10px] text-bloom-brown/40 uppercase font-bold tracking-widest">
                     {p.cooperativeId?.name || 'Bloom'} • {p.description || 'Contribution'}
@@ -128,7 +132,16 @@ const Transactions = () => {
             No results found
           </div>
         )}
-      </main>
+
+        <EditTransactionModal 
+          isOpen={!!selectedTx} 
+          transaction={selectedTx}
+          onClose={() => setSelectedTx(null)}
+          onUpdateSuccess={(updated) => {
+            setAllPayments(prev => prev.map(p => p._id === updated._id ? updated : p));
+          }}
+        />
+        </main>
     </div>
   );
 };
@@ -144,6 +157,11 @@ const FilterSelect = ({ icon, options, value, onChange }) => (
       {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
     </select>
   </div>
+
+  
 );
+
+{/* --- EDIT TRANSACTION MODAL --- */}
+
 
 export default Transactions;
